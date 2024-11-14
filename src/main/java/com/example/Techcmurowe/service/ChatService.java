@@ -7,10 +7,12 @@ import com.example.Techcmurowe.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,5 +50,20 @@ public class ChatService {
             return chatRepository.save(chat);
         }
         else throw new ResponseStatusException(HttpStatus.CONFLICT, "There is a chat with those users already.");
+    }
+
+    public List<Chat> getChatsForUser(Long user1Id) {
+        User user1 = userRepository.findById(user1Id).orElse(null);
+
+        if (user1 == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+
+        List<Chat> chats = chatRepository.findChatsByUser1_IdOrUser2_Id(user1Id, user1Id);
+
+        return chats;
+    }
+
+    public boolean checkIfChatExists(Long user1Id, Long user2Id){
+        // Check if there is a chat for those users
+        return chatRepository.findByUser1_IdAndUser2_Id(user1Id, user2Id).isPresent() || chatRepository.findByUser1_IdAndUser2_Id(user2Id, user1Id).isPresent();
     }
 }

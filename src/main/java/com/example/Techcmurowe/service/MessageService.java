@@ -11,6 +11,7 @@ import com.example.Techcmurowe.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,18 +26,22 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     public MessageService(MessageRepository messageRepository,
                           ChatRepository chatRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          SimpMessagingTemplate messagingTemplate) {
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
-    public MessageResponseDTO sendMessage(Long chatId, MessageDTO messageDTO) {
+    public MessageResponseDTO sendMessage(Long chatId, Message message) {
         Chat chat = chatRepository.findById(chatId).orElse(null);
-        User sender = userRepository.findById(messageDTO.getSenderId()).orElse(null);
-        User receiver = userRepository.findById(messageDTO.getReceiverId()).orElse(null);
+        User sender = userRepository.findById(message.getSender().getId()).orElse(null);
+        User receiver = userRepository.findById(message.getReceiver().getId()).orElse(null);
 
         if (chat == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat not found");
@@ -53,15 +58,19 @@ public class MessageService {
 
         LocalDateTime messageCreatedAt = LocalDateTime.now();
 
-        // Saving message to database
-        Message message = new Message();
-        message.setMessage(messageDTO.getMessage());
-        message.setSender(sender);
-        message.setReceiver(receiver);
-        message.setDatetime(messageCreatedAt);
-        message.setChat(chat);
+//        // Saving message to database
+//        Message message = new Message();
+//        message.setMessage(messageDTO.getMessage());
+//        message.setSender(sender);
+//        message.setReceiver(receiver);
+//        message.setDatetime(messageCreatedAt);
+//        message.setChat(chat);
+//
+//        Message savedMessage = messageRepository.save(message);
 
-        Message savedMessage = messageRepository.save(message);
+        // Send a new message to a specific route
+        messagingTemplate.convertAndSendToUser(receiver.getId().toString(),"/queue/messages/", message);
+
 
         // Converting to MessageResponseDTO
 

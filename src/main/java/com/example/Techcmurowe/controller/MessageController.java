@@ -12,6 +12,7 @@ import com.example.Techcmurowe.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,8 +34,10 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping("/chat/{chatId}")
-    public MessageResponseDTO sendMessage(@PathVariable Long chatId, @RequestBody MessageDTO message) {
+    @MessageMapping("/sendmessage/{chatId}}")
+    // TUTAJ DODAĆ KONKRENTY WYMAGANY SCOPE DO DOSTĘPU
+    //  @PreAuthorize("hasAuthority('SCOPE_users')")
+    public MessageResponseDTO sendMessage(@DestinationVariable Long chatId, @Payload Message message) {
 
         return messageService.sendMessage(chatId, message);
     }

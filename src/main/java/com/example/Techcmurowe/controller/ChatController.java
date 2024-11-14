@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -49,5 +50,15 @@ public class ChatController {
         Chat chat = chatService.createChat(user1Id, user2Id);
 
         return new ResponseEntity<>(chat, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/getalluserchats/{userId}")
+    public ResponseEntity<List<Chat>> getAllUserChats(@PathVariable Long userId) {
+        return ResponseEntity.ok(chatService.getChatsForUser(userId));
+    }
+
+    @GetMapping("/checkifexists")
+    public ResponseEntity<Boolean> checkIfChatExists(@RequestParam Long user1Id, @RequestParam Long user2Id) {
+        return ResponseEntity.ok(chatService.checkIfChatExists(user1Id, user2Id));
     }
 }
