@@ -3,6 +3,7 @@ package com.example.Techcmurowe.service;
 import com.example.Techcmurowe.model.User;
 import com.example.Techcmurowe.repository.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -15,13 +16,18 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User CreateUser(User user) {
-        User newUser = userRepository.findByUsername(user.getUsername()).orElse(null);
-        if (newUser != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
+    public ResponseEntity<String> CreateUser(String username) {
+        System.out.println("User searching: " + username);
+        if (!userRepository.findByUsername(username).isPresent()) {
+            User user = new User();
+            user.setUsername(username);
+            userRepository.save(user);
+            System.out.println("User created");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Created user successfully");
         }
-        else userRepository.save(user);
-        return newUser;
+        else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
+        }
     }
 
 }

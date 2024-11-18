@@ -15,13 +15,13 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private User user1;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private User user2;
 
-    @OneToMany(mappedBy = "chat")
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
 }

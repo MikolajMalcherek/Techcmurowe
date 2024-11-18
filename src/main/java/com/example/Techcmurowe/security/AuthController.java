@@ -22,4 +22,5 @@ public class AuthController {
         // Zamiast tego kodu normalnie wysyłasz kod do Cognito, aby uzyskać token
         return cognitoService.getToken(code);
     }
+
 }

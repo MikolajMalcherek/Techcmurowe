@@ -26,7 +26,8 @@ public class CognitoService {
     private final WebClient webClient;
 
 
-    public CognitoService(WebClient.Builder webClient, @Value("${spring.security.oauth2.client.provider.cognito.token-uri}") String cognitoTokenUrl) {
+    public CognitoService(WebClient.Builder webClient,
+                          @Value("${spring.security.oauth2.client.provider.cognito.token-uri}") String cognitoTokenUrl) {
         this.webClient = webClient.baseUrl(cognitoTokenUrl).build();
     }
 
@@ -46,4 +47,5 @@ public class CognitoService {
                 .retrieve()
                 .bodyToMono(String.class);
     }
+
 }
