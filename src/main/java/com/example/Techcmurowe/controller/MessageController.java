@@ -14,6 +14,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -34,16 +35,18 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @MessageMapping("/sendmessage/{chatId}}")
+    @MessageMapping("/sendmessage/{chatId}")
+    @SendToUser("/queue/messages")
     // TUTAJ DODAĆ KONKRENTY WYMAGANY SCOPE DO DOSTĘPU
     //  @PreAuthorize("hasAuthority('SCOPE_users')")
-    public MessageResponseDTO sendMessage(@DestinationVariable Long chatId, @Payload Message message) {
+    public MessageResponseDTO sendMessage(@DestinationVariable Long chatId, @Payload MessageDTO message) {
 
         return messageService.sendMessage(chatId, message);
     }
 
     @GetMapping("/{chatId}")
-    public List<Message> getMessagesForChat(@PathVariable Long chatId) {
-        return messageRepository.findAllByChatId(chatId);
+    public List<MessageResponseDTO> getMessagesForChat(@PathVariable Long chatId) {
+
+        return messageService.findAllByChatId(chatId);
     }
 }

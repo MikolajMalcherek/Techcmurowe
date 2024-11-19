@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MessageService {
@@ -38,10 +40,11 @@ public class MessageService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public MessageResponseDTO sendMessage(Long chatId, Message message) {
+    public MessageResponseDTO sendMessage(Long chatId, MessageDTO message) {
+        System.out.println("Inside sendMessage");
         Chat chat = chatRepository.findById(chatId).orElse(null);
-        User sender = userRepository.findById(message.getSender().getId()).orElse(null);
-        User receiver = userRepository.findById(message.getReceiver().getId()).orElse(null);
+        User sender = userRepository.findById(message.getSenderId()).orElse(null);
+        User receiver = userRepository.findById(message.getReceiverId()).orElse(null);
 
         if (chat == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat not found");
@@ -52,37 +55,55 @@ public class MessageService {
         if (receiver == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        if (!chatRepository.existsByUser1_IdAndUser2_Id(sender.getId(), receiver.getId())) {
+        if (!chatRepository.existsByUser1_IdAndUser2_Id(sender.getId(), receiver.getId()) && !chatRepository.existsByUser1_IdAndUser2_Id(receiver.getId(), sender.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat not found for those users");
         }
 
         LocalDateTime messageCreatedAt = LocalDateTime.now();
 
-//        // Saving message to database
-//        Message message = new Message();
-//        message.setMessage(messageDTO.getMessage());
-//        message.setSender(sender);
-//        message.setReceiver(receiver);
-//        message.setDatetime(messageCreatedAt);
-//        message.setChat(chat);
-//
-//        Message savedMessage = messageRepository.save(message);
+        // Saving message to database
+        Message newMessage = new Message();
+        newMessage.setMessage(message.getMessage());
+        newMessage.setSender(sender);
+        newMessage.setReceiver(receiver);
+        newMessage.setDatetime(messageCreatedAt);
+        newMessage.setChat(chat);
 
-        // Send a new message to a specific route
-        messagingTemplate.convertAndSendToUser(receiver.getId().toString(),"/queue/messages/", message);
-
+        messageRepository.save(newMessage);
 
         // Converting to MessageResponseDTO
 
         MessageResponseDTO messageResponse = new MessageResponseDTO();
 
-        messageResponse.setId(message.getId());
-        messageResponse.setMessage(message.getMessage());
-        messageResponse.setSenderId(sender.getId());
-        messageResponse.setReceiverId(receiver.getId());
-        messageResponse.setDatetime(messageCreatedAt);
-        messageResponse.setChatId(chat.getId());
+//        messageResponse.setId(newMessage.getId());
+        messageResponse.setMessage(newMessage.getMessage());
+        messageResponse.setSenderId(newMessage.getSender().getId());
+        messageResponse.setReceiverId(newMessage.getReceiver().getId());
+//        messageResponse.setDatetime(messageCreatedAt);
+        messageResponse.setChatId(newMessage.getChat().getId());
+
+        // Send a new message to a specific route
+        messagingTemplate.convertAndSend("/topic/chat/" + chatId, messageResponse);
 
         return messageResponse;
+    }
+
+    public List<MessageResponseDTO> findAllByChatId(Long chatId) {
+        System.out.println("Inside findAllByChatId");
+        List<Message> messages = messageRepository.findAllByChatId(chatId);
+
+        List<MessageResponseDTO> messageResponses = new ArrayList<>();
+
+        for (Message message : messages) {
+            MessageResponseDTO messageResponse = new MessageResponseDTO();
+//            messageResponse.setId(message.getId());
+            messageResponse.setMessage(message.getMessage());
+            messageResponse.setSenderId(message.getSender().getId());
+            messageResponse.setReceiverId(message.getReceiver().getId());
+//            messageResponse.setDatetime(message.getDatetime());
+            messageResponse.setChatId(message.getChat().getId());
+            messageResponses.add(messageResponse);
+        }
+        return messageResponses;
     }
 }

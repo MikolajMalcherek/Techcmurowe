@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class MessageResponseDTO {
-    private Long id;
+//    private Long id;
     private String message;
     private Long senderId;
     private Long receiverId;
-    private LocalDateTime datetime;
+//    private LocalDateTime datetime;
     private Long chatId;
 }

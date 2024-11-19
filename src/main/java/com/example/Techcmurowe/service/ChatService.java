@@ -66,4 +66,28 @@ public class ChatService {
         // Check if there is a chat for those users
         return chatRepository.findByUser1_IdAndUser2_Id(user1Id, user2Id).isPresent() || chatRepository.findByUser1_IdAndUser2_Id(user2Id, user1Id).isPresent();
     }
+
+    public Chat beginChat(Long user1Id, Long user2Id) {
+
+        if(checkIfChatExists(user1Id, user2Id)){
+            if(chatRepository.findByUser1_IdAndUser2_Id(user1Id, user2Id).isPresent()){
+                return chatRepository.findByUser1_IdAndUser2_Id(user1Id, user2Id).get();
+            }
+            else return chatRepository.findByUser1_IdAndUser2_Id(user2Id, user1Id).get();
+        }
+        else {
+            Chat newChat = new Chat();
+
+            Optional<User> user1 = userRepository.findById(user1Id);
+            Optional<User> user2 = userRepository.findById(user2Id);
+            if (user1.isPresent() && user2.isPresent()) {
+                newChat.setUser1(user1.get());
+                newChat.setUser2(user2.get());
+                newChat.setMessages(new ArrayList<>());
+                return chatRepository.save(newChat);
+            }
+            else throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+
+        }
+    }
 }
