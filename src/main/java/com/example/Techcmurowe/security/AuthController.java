@@ -19,7 +19,7 @@ public class AuthController {
 
     @GetMapping("/callback")
     public Mono<String> callback(@RequestParam String code) {
-        // Zamiast tego kodu normalnie wysyłasz kod do Cognito, aby uzyskać token
+
         return cognitoService.getToken(code);
     }
 
