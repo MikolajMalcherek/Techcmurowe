@@ -36,6 +36,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -52,7 +53,7 @@ public class UserController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+
     @PostMapping("/create")
     public ResponseEntity<String> createUser(@RequestBody UserResponseDTO user) {
 

@@ -33,6 +33,8 @@ public class CognitoService {
 
     public Mono<String> getToken(String code) {
 
+        System.out.println("Inside getToken method");
+
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", COGNITO_CLIENT_ID);

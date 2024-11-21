@@ -27,6 +27,7 @@ public class ChatController {
     UserRepository userRepository;
 
     // Trzeba dodać, żeby szukało niezależnie od kolejności id.
+
     @GetMapping("/{user1Id}/{user2Id}")
     public ResponseEntity<Optional<Chat>> findChatByUsersIds(@PathVariable Long user1Id,@PathVariable Long user2Id) {
         Optional<Chat> chat = chatRepository.findByUser1_IdAndUser2_Id(user1Id, user2Id);
