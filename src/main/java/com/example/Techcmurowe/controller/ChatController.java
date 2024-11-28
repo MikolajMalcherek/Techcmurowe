@@ -63,7 +63,7 @@ public class ChatController {
         return ResponseEntity.ok(chatService.checkIfChatExists(user1Id, user2Id));
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+//    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/beginchat")
     public ResponseEntity<Chat> beginChat(@RequestParam Long user1Id, @RequestParam Long user2Id ) {
 

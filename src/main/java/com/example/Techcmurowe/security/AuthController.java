@@ -19,7 +19,7 @@ public class AuthController {
 
     @GetMapping("/callback")
     public Mono<String> callback(@RequestParam String code) {
-
+        System.err.println(code + "######code");
         return cognitoService.getToken(code);
     }
 

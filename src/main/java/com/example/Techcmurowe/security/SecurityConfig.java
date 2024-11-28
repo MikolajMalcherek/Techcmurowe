@@ -24,7 +24,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authz -> authz.requestMatchers("/callback").permitAll()
+                .authorizeRequests(authz -> authz.requestMatchers("/callback").permitAll()
                         .requestMatchers("/websocket/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -44,7 +44,14 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));  // Frontend URL
+        configuration.setAllowedOrigins(List.of("https://localhost:4200",
+                "https://52.3.73.243",
+                "http://localhost:4200",
+                "https://52.3.73.243:443",
+                "https://52.3.73.243:80",
+                "https://50.16.52.223:443",
+                "https://50.16.52.223:80",
+                "https://50.16.52.223"));  // Frontend URL
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));  // Allowed HTTP methods
         configuration.setAllowedHeaders(List.of("*"));  // Allow all headers
         configuration.setAllowCredentials(true);  // Allow credentials (cookies, authorization headers, etc.)

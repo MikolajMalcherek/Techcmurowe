@@ -42,6 +42,7 @@ public class CognitoService {
         body.add("code", code);
         body.add("redirect_uri", COGNITO_REDIRECT_URI);
 
+        System.err.println("Body: " + body.toString());
 
         return webClient.post()
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
