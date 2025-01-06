@@ -55,7 +55,7 @@ public class UserController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<String> createUser(@RequestBody UserResponseDTO user) {
+    public ResponseEntity<Object> createUser(@RequestBody UserResponseDTO user) {
 
         return userService.CreateUser(user.getUsername());
     }
